@@ -23,6 +23,7 @@
 
 ##  DEPENDENCIES  #####################################################
 
+import os
 from io import StringIO
 from urllib import request
 
@@ -206,11 +207,11 @@ def consensus_alignment(pdb_id:str, pdb_chain:str, aa_seq:'Bio.Seq.Seq', muscle_
         aa_seq : Bio.Seq.Seq
             amino acid sequence
         muscle_exe : str
-            MUSCLE executable (relative path)
+            MUSCLE executable (relative or absolute path)
     """
 
     file_in = f"{pdb_id}-{pdb_chain}_align.fasta"
-    muscle_cline = MuscleCommandline(muscle_exe, input=file_in)
+    muscle_cline = MuscleCommandline(os.path.abspath(muscle_exe), input=file_in)
     stdout, stderr = muscle_cline()
     alignment = AlignIO.read(StringIO(stdout), "fasta")
     summary_align = AlignInfo.SummaryInfo(alignment)            # Object for studying properties of the alignment
