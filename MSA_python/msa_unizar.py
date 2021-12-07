@@ -216,9 +216,7 @@ def consensus_alignment(pdb_id:str, pdb_chain:str, aa_seq:'Bio.Seq.Seq', muscle_
     summary_align = AlignInfo.SummaryInfo(alignment)            # Object for studying properties of the alignment
     consensus = summary_align.dumb_consensus(threshold=0.5)     # Makes the simple consensus, with X as the no-consensus symbol
     res = pairwise2.align.globalds(aa_seq, consensus, blosum62, -10, -0.5)
-    seq1 = res[0][0]
-    seq2 = res[0][1]
-    _fancy_seq_print(seq1, seq2)
+    _fancy_seq_print(res)
 
 
 ##  PRIVATE FUNCTIONS  ################################################
@@ -283,23 +281,24 @@ def _clean_xml(file_dir:str) -> None:
         file_out.write("</BlastOutput>\n")
     file_out.close()
 
-def _fancy_seq_print(seq1:'Bio.Seq.Seq', seq2:'Bio.Seq.Seq', line_lenght:int=50) -> None:
+def _fancy_seq_print(alignment:'Bio.pairwise2', line_lenght:int=50):
     """
         Print a sequence alignment and comparison in a fancy way
 
         Parameters
         ----------
-        seq1 : Bio.Seq.Seq
-            amino acid sequence of reference
-        seq2 : Bio.Seq.Seq
-            amino acid sequence for comparison
+        alignment : Bio.pairwise2
+            alignment object
         line_length : int, optional
             number of residues to print per line
     """
 
+    raw = pairwise2.format_alignment(*alignment[0]).split("\n")
+    seq1, seq_relation, seq2 = raw[0], raw[1], raw[2]
+
     if colorama:
         colorama.init()
-        colors = [Fore.RED if j=='X' else Fore.CYAN if i==j else Fore.YELLOW for i, j in zip(seq1, seq2)]
+        colors = [Fore.RED if j == 'X' else Fore.CYAN if i == j else Fore.YELLOW for i, j in zip(seq1, seq2)]
         c_normal = Style.RESET_ALL
     else:
         colors = [""]*len(seq1)
@@ -308,5 +307,6 @@ def _fancy_seq_print(seq1:'Bio.Seq.Seq', seq2:'Bio.Seq.Seq', line_lenght:int=50)
     for i in range(len(seq1)):
         if i % line_lenght == 0:
             print(f"\n\n{i+1:4d}  {seq1[i:min(len(seq1),i+line_lenght)]}\n"+" "*6, end="")
+            print(f"{seq_relation[i:min(len(seq_relation),i+line_lenght)]}\n"+" "*6, end="")
         print(f"{colors[i]}{seq2[i]}{c_normal}", end="")
     print()
