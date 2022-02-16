@@ -193,7 +193,7 @@ def get_alignment_file(pdb_id:str, pdb_chain:str, aa_seq:'Bio.Seq.Seq') -> None:
     else:
         SeqIO.write(fasta_list[0:len(fasta_list)], align_handle, "fasta")
 
-def consensus_alignment(pdb_id:str, pdb_chain:str, aa_seq:'Bio.Seq.Seq', muscle_exe:str) -> None:
+def consensus_alignment(pdb_id:str, pdb_chain:str, aa_seq:'Bio.Seq.Seq', muscle_exe:str='muscle.exe') -> None:
     """
         Get a consensus sequence based on a BLAST result and print on
         the screen its alignment to the original sequence
@@ -206,8 +206,8 @@ def consensus_alignment(pdb_id:str, pdb_chain:str, aa_seq:'Bio.Seq.Seq', muscle_
             chain ID (one letter)
         aa_seq : Bio.Seq.Seq
             amino acid sequence
-        muscle_exe : str
-            MUSCLE executable (relative or absolute path)
+        muscle_exe : str, optional
+            MUSCLE executable (relative or absolute path) (def: 'muscle.exe')
     """
 
     file_in = f"{pdb_id}-{pdb_chain}_align.fasta"
@@ -282,7 +282,7 @@ def _clean_xml(file_dir:str) -> None:
         file_out.write("</BlastOutput>\n")
     file_out.close()
 
-def _fancy_seq_print(alignment:'Bio.pairwise2', line_lenght:int=50):
+def _fancy_seq_print(alignment:'Bio.pairwise2', line_lenght:int=25) -> None:
     """
         Print a sequence alignment and comparison in a fancy way
 
